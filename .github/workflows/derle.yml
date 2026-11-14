@@ -1,0 +1,99 @@
+name: Kurulum dosyalarını derle
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  DEPO_VERSION: 1.0.${{ github.run_number }}
+
+jobs:
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: APK derle
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon assembleRelease -PversionName=$DEPO_VERSION -PversionCode=${{ github.run_number }}
+          mkdir -p ../dist
+          cp app/build/outputs/apk/release/app-release.apk ../dist/DepoTakip-$DEPO_VERSION.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/*.apk
+
+  windows:
+    name: Windows kurulum
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Node.js 24 LTS indir (kuruluma gömülecek)
+        shell: pwsh
+        run: |
+          $idx = Invoke-RestMethod https://nodejs.org/dist/index.json
+          $v = ($idx | Where-Object { $_.version -like 'v24.*' } | Select-Object -First 1).version
+          Write-Host "Node $v"
+          New-Item -ItemType Directory -Force build/node | Out-Null
+          Invoke-WebRequest "https://nodejs.org/dist/$v/node-$v-win-x64.zip" -OutFile node.zip
+          Expand-Archive node.zip -DestinationPath nodetmp
+          Copy-Item "nodetmp/node-$v-win-x64/node.exe" build/node/node.exe
+      - name: Sunucuyu test et
+        shell: pwsh
+        run: |
+          $env:DEPO_DATA_DIR = "$PWD\testdata"
+          $p = Start-Process -PassThru -NoNewWindow build/node/node.exe -ArgumentList 'server/server.js'
+          Start-Sleep 3
+          $r = Invoke-RestMethod http://localhost:8765/api/status
+          if ($r.app -ne 'DepoTakip') { throw 'Sunucu yanıt vermedi' }
+          Stop-Process $p.Id
+      - name: Kurulum sihirbazını derle
+        shell: pwsh
+        run: |
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" windows\DepoTakip.iss
+      - name: Taşınabilir paket
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force pkg/DepoTakip | Out-Null
+          Copy-Item -Recurse server, public pkg/DepoTakip/
+          Copy-Item -Recurse windows/araclar pkg/DepoTakip/
+          Copy-Item windows/Kur.bat, windows/Kaldir.bat pkg/DepoTakip/
+          New-Item -ItemType Directory -Force pkg/DepoTakip/node | Out-Null
+          Copy-Item build/node/node.exe pkg/DepoTakip/node/
+          Copy-Item -Recurse docs pkg/DepoTakip/belgeler
+          Compress-Archive pkg/DepoTakip "dist/DepoTakip-Tasinabilir-$env:DEPO_VERSION.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*
+
+  yayinla:
+    name: Sürüm yayınla
+    needs: [android, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.DEPO_VERSION }}
+          name: Depo Takip ${{ env.DEPO_VERSION }}
+          make_latest: true
+          body: |
+            **Windows:** `DepoTakip-Kurulum-*.exe` dosyasını depo bilgisayarına indirip çalıştırın.
+            **Android:** `DepoTakip-*.apk` dosyasını telefona indirip kurun.
+            Ayrıntılar için belgeler klasöründeki kullanım kılavuzuna bakın.
+          files: dist/*

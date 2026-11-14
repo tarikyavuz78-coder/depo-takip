@@ -1,0 +1,43 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.depotakip.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.depotakip.app'
+        minSdk 24
+        targetSdk 34
+        versionCode((project.findProperty('versionCode') ?: '1').toString().toInteger())
+        versionName((project.findProperty('versionName') ?: '1.0.0').toString())
+    }
+
+    signingConfigs {
+        release {
+            storeFile file('depotakip.jks')
+            storePassword 'depotakip2026'
+            keyAlias 'depotakip'
+            keyPassword 'depotakip2026'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.gms:play-services-code-scanner:16.1.0'
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+}

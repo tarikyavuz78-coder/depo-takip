@@ -1,0 +1,364 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Depo Takip — Kullanım Kılavuzu</title><style>body{font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif;max-width:860px;margin:0 auto;padding:28px 20px 60px;line-height:1.6;color:#142126;background:#fff}
+h1{color:#0f4c52;font-size:28px;border-bottom:3px solid #f2b33d;padding-bottom:8px}h2{color:#0f4c52;margin-top:36px;border-bottom:1px solid #d9e0de;padding-bottom:4px}h3{margin-top:24px}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14px}th,td{border:1px solid #d9e0de;padding:7px 10px;text-align:left;vertical-align:top}th{background:#eef4f4}
+code{background:#eef1f0;padding:1px 5px;border-radius:4px;font-size:.92em}blockquote{margin:12px 0;padding:10px 16px;background:#fdf5e3;border-left:4px solid #f2b33d}
+@media print{body{padding:0}h2{page-break-after:avoid}}</style></head><body><h1 id="depo-takip-kurulum-ve-kullanm-klavuzu">Depo Takip — Kurulum ve Kullanım Kılavuzu</h1>
+<p>Sürüm 1.0</p>
+<h2 id="1-sistem-nasl-calsr">1. Sistem nasıl çalışır?</h2>
+<p>Depo Takip üç parçadan oluşur:</p>
+<ul>
+<li><strong>Depo bilgisayarı (sunucu).</strong> Tüm veriler bu Windows bilgisayardaki tek bir veritabanında tutulur. Sunucu, Windows açıldığında kendiliğinden başlar; kimsenin oturum açmasına gerek yoktur.</li>
+<li><strong>Bilgisayardaki uygulama.</strong> Masaüstündeki <strong>Depo Takip</strong> kısayolu uygulamayı ayrı bir pencerede açar. Aynı ağdaki başka bilgisayarlar da tarayıcıdan <code>http://&lt;depo-bilgisayarı-adresi&gt;:8765</code> adresiyle girebilir.</li>
+<li><strong>Android uygulaması.</strong> Telefon, fabrika Wi-Fi'ı üzerinden aynı sunucuya bağlanır. QR kodlar telefonun kamerasıyla okutulur.</li>
+</ul>
+<p>Bütün ekranlar aynı veritabanını kullanır. Bir telefonda kaydedilen hareket, birkaç saniye içinde diğer tüm ekranlara yansır.</p>
+<h3 id="stok-nasl-hesaplanr">Stok nasıl hesaplanır?</h3>
+<p>Stok miktarı elle değiştirilen bir sayı değildir. Her işlem (giriş, transfer, üretime çıkış, fire, iade, sayım) ayrı bir <strong>hareket kaydı</strong> olarak saklanır. Kalan stok bu kayıtlardan otomatik hesaplanır:</p>
+<blockquote>
+<p>Kalan stok = Girişler + İadeler − Üretime verilenler − Fireler ± Sayım düzeltmeleri</p>
+</blockquote>
+<p>Transfer, Ham Depo ile Cep Depo arasında yer değiştirir; toplam stoğu değiştirmez.</p>
+<p>Hareketler <strong>silinemez</strong>. Hatalı bir kayıt, yönetici tarafından <strong>iptal</strong> edilir. İptal, ters yönde yeni bir kayıt oluşturur; iki kayıt da geçmişte görünür. Böylece her değişikliğin kim tarafından, ne zaman ve neden yapıldığı izlenebilir.</p>
+<h3 id="depolar">Depolar</h3>
+<table>
+<thead>
+<tr>
+<th>Depo</th>
+<th>Kullanım</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Ham Depo</strong></td>
+<td>Tedarikçiden gelen malzemenin girdiği ana depo</td>
+</tr>
+<tr>
+<td><strong>Cep Depo</strong></td>
+<td>Üretim hattının yanındaki ara depo; üretime çıkışlar varsayılan olarak buradan düşülür</td>
+</tr>
+</tbody>
+</table>
+<h3 id="kyn-kodlar-ve-qr">KYN kodları ve QR</h3>
+<p>Her hammaddenin kalıcı bir kodu vardır: <code>KYN-&lt;KATEGORİ&gt;-&lt;SIRA&gt;</code>. Örneğin <code>KYN-PRF-003</code> = 0,5 L Preform. QR kodun içinde yalnızca bu kod bulunur. Ürünün adı değişse bile etiketi yeniden basmanız gerekmez. Silinen bir kodun numarası başka bir ürüne verilmez.</p>
+<table>
+<thead>
+<tr>
+<th>Kod</th>
+<th>Kategori</th>
+<th>Kod</th>
+<th>Kategori</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PRF</td>
+<td>Preform</td>
+<td>TUT</td>
+<td>Tutkal</td>
+</tr>
+<tr>
+<td>KPK</td>
+<td>Kapak</td>
+<td>BNT</td>
+<td>Bant</td>
+</tr>
+<tr>
+<td>KLP</td>
+<td>Kulp / Handle</td>
+<td>CAM</td>
+<td>Cam Şişe</td>
+</tr>
+<tr>
+<td>ETK</td>
+<td>Etiket</td>
+<td>GDA</td>
+<td>Gıda Hammaddesi ve Katkı</td>
+</tr>
+<tr>
+<td>BRD</td>
+<td>Bardak Su Ambalajı</td>
+<td>KOD</td>
+<td>Kodlama Sarfı</td>
+</tr>
+<tr>
+<td>FLM</td>
+<td>Shrink / Stretch Film</td>
+<td>KAY</td>
+<td>Bant Kaydırıcı</td>
+</tr>
+<tr>
+<td>KOL</td>
+<td>Koli</td>
+<td>TMZ</td>
+<td>Temizlik ve Dezenfeksiyon</td>
+</tr>
+<tr>
+<td>PLT</td>
+<td>Palet ve Ara Malzeme</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Sistem 120 hammaddeyle hazır gelir. Yeni kalem ve yeni kategori eklenebilir.</p>
+<h3 id="kullanc-yetkileri">Kullanıcı yetkileri</h3>
+<table>
+<thead>
+<tr>
+<th>Yetki</th>
+<th>Yapabilecekleri</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Yönetici</strong></td>
+<td>Her şey: hammadde kartları, asgari seviyeler, sayım düzeltme, hareket iptali, kullanıcılar, Excel'den içe aktarma, yedekleme</td>
+</tr>
+<tr>
+<td><strong>Depocu</strong></td>
+<td>Giriş, transfer, üretime çıkış, fire ve iade kaydı; stokları ve raporları görme</td>
+</tr>
+<tr>
+<td><strong>İzleyici</strong></td>
+<td>Yalnızca görüntüleme ve rapor alma</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-windows-kurulumu-depo-bilgisayar">2. Windows kurulumu (depo bilgisayarı)</h2>
+<h3 id="kurulum-sihirbazyla-onerilen">Kurulum sihirbazıyla (önerilen)</h3>
+<ol>
+<li><code>DepoTakip-Kurulum-x.y.z.exe</code> dosyasını depo bilgisayarına kopyalayıp çalıştırın.</li>
+<li>Windows <strong>"Bu uygulamanın değişiklik yapmasına izin verilsin mi?"</strong> diye sorarsa <strong>Evet</strong> deyin.</li>
+<li>Kurulum bittiğinde Depo Takip açılır ve <strong>İlk Kurulum</strong> ekranı gelir.</li>
+<li>Firma adını, kendi adınızı, kullanıcı adınızı ve şifrenizi girin. Bu hesap <strong>Yönetici</strong> hesabıdır.</li>
+</ol>
+<p>Kurulum sihirbazı şunları otomatik yapar:</p>
+<ul>
+<li>Programı <code>C:\Program Files\DepoTakip</code> klasörüne kurar.</li>
+<li>Sunucuyu Windows açılışında başlayacak şekilde ayarlar. Kapanırsa bir dakika içinde yeniden başlar.</li>
+<li>Telefonların bağlanabilmesi için Windows Güvenlik Duvarı'nda 8765 numaralı portu açar.</li>
+<li>Masaüstüne ve Başlat menüsüne <strong>Depo Takip</strong> kısayolu ekler.</li>
+</ul>
+<p>Ayrıca bir programın (Node.js vb.) kurulmasına gerek yoktur; gerekli her şey kurulum dosyasının içindedir.</p>
+<h3 id="tasnabilir-paketle-alternatif">Taşınabilir paketle (alternatif)</h3>
+<ol>
+<li><code>DepoTakip-Tasinabilir-x.y.z.zip</code> dosyasını <code>C:\DepoTakip</code> gibi kalıcı bir klasöre çıkarın. <strong>İndirilenler</strong> klasöründe bırakmayın.</li>
+<li>Klasördeki <code>Kur.bat</code> dosyasına çift tıklayın ve yönetici iznini onaylayın.</li>
+</ol>
+<h3 id="bilgisayar-icin-onemli-ayarlar">Bilgisayar için önemli ayarlar</h3>
+<ul>
+<li><strong>Uyku modunu kapatın.</strong> Denetim Masası → Güç Seçenekleri bölümünde <strong>Bilgisayarı uyku moduna geçir: Hiçbir zaman</strong> seçin. Bilgisayar uyursa telefonlar bağlanamaz.</li>
+<li><strong>Sabit IP verin.</strong> Modem arayüzünde bu bilgisayara <strong>DHCP rezervasyonu (sabit IP)</strong> tanımlayın. Böylece telefonlardaki adres hiç değişmez. Bu ayar için IT sorumlunuzdan veya modem kılavuzundan yardım alabilirsiniz.</li>
+</ul>
+<h2 id="3-android-telefona-kurulum">3. Android telefona kurulum</h2>
+<ol>
+<li><code>DepoTakip-x.y.z.apk</code> dosyasını telefona aktarın. Bunun için WhatsApp, e-posta, USB kablo veya Google Drive kullanabilirsiniz.</li>
+<li>Dosyaya dokunun. Telefon <strong>"Bilinmeyen uygulamalar"</strong> uyarısı verirse, açılan ekrandan <strong>Bu kaynağa izin ver</strong> seçeneğini açın ve <strong>Yükle</strong>'ye dokunun.</li>
+<li>Play Protect uyarısı çıkarsa <strong>Yine de yükle</strong>'yi seçin. Uygulama firmanıza özeldir, Play Store'da yer almaz.</li>
+<li>Uygulamayı açın. Bildirim izni istenirse <strong>İzin ver</strong> deyin; stok uyarıları bu sayede telefona gelir.</li>
+<li>Bilgisayarda <strong>Ayarlar → Telefon bağlantısı</strong> ekranını açın.</li>
+<li>Telefonda <strong>Sunucuyu QR ile bul</strong>'a dokunup ekrandaki QR kodu okutun. İsterseniz adresi elle de yazabilirsiniz, örneğin <code>192.168.1.20</code>.</li>
+<li>Kendi kullanıcı adınız ve şifrenizle giriş yapın.</li>
+</ol>
+<p>Telefon ile bilgisayar <strong>aynı Wi-Fi ağında</strong> olmalıdır. Telefonda mobil veri açık olsa bile sorun olmaz.</p>
+<p>Daha sonra uygulamayı güncellemek için yeni APK'yı aynı şekilde kurmanız yeterlidir. Veriler sunucuda durduğu için hiçbir şey kaybolmaz.</p>
+<h2 id="4-ilk-ayarlar-yalnzca-bir-kez">4. İlk ayarlar (yalnızca bir kez)</h2>
+<ol>
+<li><strong>Kullanıcıları ekleyin.</strong> <strong>Ayarlar → Kullanıcılar → Yeni kullanıcı</strong> yolunu izleyin. Her çalışana ayrı hesap açın ki hareket kayıtlarında kimin ne yaptığı görünsün.</li>
+<li><strong>Açılış stoklarını ve asgari seviyeleri girin:</strong></li>
+<li><strong>Ayarlar → Excel ile toplu giriş → Excel şablonunu indir</strong> düğmesine basın.</li>
+<li>Şablonu açın. Her satırda bir hammadde vardır.<ul>
+<li><strong>Ham Depo Sayım</strong> ve <strong>Cep Depo Sayım</strong> sütunlarına depoda saydığınız miktarı yazın.</li>
+<li><strong>Asgari Stok (Toplam)</strong> sütununa iki deponun toplamı için alt sınırı yazın. Stok bu sınıra inince uyarı verilir.</li>
+<li><strong>Cep Asgari</strong> sütununa Cep Depo için alt sınırı yazın. Bu sınırın altına inilince "Cep depoya transfer gerekli" uyarısı verilir. Bu sütun isteğe bağlıdır.</li>
+<li>Boş bıraktığınız hücreler değiştirilmez.</li>
+</ul>
+</li>
+<li>Dosyayı kaydedip aynı ekrandan yükleyin. Önce bir önizleme gösterilir; <strong>Kaydet</strong>'e basmadan hiçbir şey değişmez.</li>
+<li><strong>QR etiketlerini basın.</strong> <strong>QR Etiketleri</strong> ekranında hammaddeleri seçin, etiket boyutunu belirleyin ve <strong>Yazdır</strong>'a basın. Etiketleri raflara, kasalara veya paletlere yapıştırın.</li>
+</ol>
+<p>Şablonu istediğiniz zaman yeniden indirip kullanabilirsiniz. Örneğin ay sonu sayımları için de aynı yöntem geçerlidir.</p>
+<h2 id="5-gunluk-kullanm">5. Günlük kullanım</h2>
+<h3 id="qr-okutarak-urun-bulma">QR okutarak ürün bulma</h3>
+<p><strong>QR Okut</strong> düğmesine (telefonda alttaki ortadaki düğme) dokunun ve etiketi okutun. Ürünün Ham, Cep ve Toplam stoğu görünür. Buradan doğrudan <strong>Giriş</strong>, <strong>Transfer</strong>, <strong>Üretim</strong>, <strong>Fire</strong> veya <strong>İade</strong> işlemine geçebilirsiniz.</p>
+<p>Bilgisayarda USB veya Bluetooth barkod okuyucu kullanıyorsanız, herhangi bir ekranda etiketi okutmanız yeterlidir; ürün kartı açılır.</p>
+<h3 id="islem-turleri">İşlem türleri</h3>
+<table>
+<thead>
+<tr>
+<th>İşlem</th>
+<th>Ne zaman?</th>
+<th>Varsayılan depo</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Giriş</strong></td>
+<td>Tedarikçiden malzeme geldiğinde</td>
+<td>Ham Depo'ya girer</td>
+</tr>
+<tr>
+<td><strong>Transfer</strong></td>
+<td>Ham Depo'dan Cep Depo'ya veya tersine taşırken</td>
+<td>Ham → Cep</td>
+</tr>
+<tr>
+<td><strong>Üretime Çıkış</strong></td>
+<td>Hatta malzeme verildiğinde</td>
+<td>Cep Depo'dan düşer</td>
+</tr>
+<tr>
+<td><strong>Fire</strong></td>
+<td>Malzeme kullanılamaz hale geldiğinde (neden yazmak zorunludur)</td>
+<td>Cep Depo'dan düşer</td>
+</tr>
+<tr>
+<td><strong>İade</strong></td>
+<td>Üretimde kullanılmayan malzeme geri geldiğinde</td>
+<td>Cep Depo'ya girer</td>
+</tr>
+<tr>
+<td><strong>Sayım</strong></td>
+<td>Fiili sayım sistemle tutmadığında (yalnızca Yönetici)</td>
+<td>Seçilen depo</td>
+</tr>
+</tbody>
+</table>
+<p>Depoyu her işlemde değiştirebilirsiniz.</p>
+<h3 id="birden-cok-kalemi-tek-seferde-kaydetme">Birden çok kalemi tek seferde kaydetme</h3>
+<p>Aynı irsaliyeyle birden fazla kalem geldiyse şöyle ilerleyin:</p>
+<ol>
+<li>İrsaliye numarasını ve tedarikçiyi bir kez yazın.</li>
+<li>İlk hammaddeyi seçip miktarını girin, <strong>Listeye ekle</strong>'ye basın.</li>
+<li>Diğer kalemler için aynı adımı tekrarlayın.</li>
+<li><strong>Kaydet</strong>'e basın. Hepsi tek seferde kaydedilir; biri hatalıysa hiçbiri kaydedilmez.</li>
+</ol>
+<h3 id="yetersiz-stok-korumas">Yetersiz stok koruması</h3>
+<p>Bir depodan, o depodaki mevcut miktardan fazla çıkış yapılamaz. Sistem uyarı verir ve kaydı reddeder. Gerçek stok farklıysa yönetici <strong>Sayım</strong> ile düzeltir.</p>
+<h3 id="wi-fi-koparsa">Wi-Fi koparsa</h3>
+<p>Bağlantı yokken telefonda kaydettiğiniz işlemler kaybolmaz. Telefonda bekletilir ve bağlantı gelince otomatik gönderilir. Üst çubukta <strong>"x bekleyen"</strong> yazısı görünür. Sunucu bir işlemi kabul etmezse (örneğin stok o arada bittiyse), ekranda <strong>"reddedildi"</strong> uyarısı çıkar; işlemi kontrol edip yeniden girin.</p>
+<h3 id="hatal-kayd-duzeltme">Hatalı kaydı düzeltme</h3>
+<p>Yönetici, <strong>Hareket Geçmişi</strong> ekranında ilgili satırdaki <strong>İptal</strong> düğmesine basar ve iptal nedenini yazar. Ardından doğru kayıt yeniden girilir.</p>
+<h2 id="6-stok-uyarlar">6. Stok uyarıları</h2>
+<table>
+<thead>
+<tr>
+<th>Durum</th>
+<th>Anlamı</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kritik</strong></td>
+<td>İki deponun toplamı asgari stok seviyesine eşit veya altında</td>
+</tr>
+<tr>
+<td><strong>Tükendi</strong></td>
+<td>Asgari seviyesi tanımlı bir kalemin stoğu sıfır</td>
+</tr>
+<tr>
+<td><strong>Transfer gerekli</strong></td>
+<td>Cep Depo, Cep Asgari seviyesinin altında ama Ham Depo'da stok var</td>
+</tr>
+</tbody>
+</table>
+<p>Bir kalem bu durumlardan birine girdiğinde, hareketi kim girmiş olursa olsun açık olan tüm ekranlarda uyarı çıkar. Telefonda Android bildirimi de gelir. Zil simgesindeki sayı, uyarıdaki kalem sayısını gösterir.</p>
+<p><strong>Tahmini yeterlilik</strong>, son 30 günün ortalama tüketimine (üretim + fire) göre mevcut stoğun kaç gün yeteceğini gösterir.</p>
+<h2 id="7-raporlar-ve-excel">7. Raporlar ve Excel</h2>
+<ul>
+<li><strong>Stok Durumu:</strong> Tüm kalemlerin Ham, Cep ve Toplam stoğu; asgari seviyeleri, durumları ve tahmini yeterlilik süreleri.</li>
+<li><strong>Stok Uyarıları:</strong> Uyarıdaki kalemler ve asgari seviyeye ulaşmak için eksik miktar.</li>
+<li><strong>Dönem Raporu:</strong> Seçilen tarih aralığında her kalem için şu bilgiler: dönem başı, giriş, Cep'e transfer, üretime verilen, iade, fire, fire oranı, sayım farkı ve dönem sonu. Excel dosyasının ikinci sayfasında dönemin tüm hareketleri yer alır.</li>
+<li><strong>Hareket Geçmişi:</strong> Tarih, işlem türü, depo, kullanıcı ve metin filtreleriyle; filtrelenmiş liste Excel'e aktarılabilir.</li>
+</ul>
+<p>Excel dosyaları bilgisayarda <strong>İndirilenler</strong> klasörüne, telefonda <strong>İndirilenler</strong> (Download) klasörüne kaydedilir.</p>
+<h2 id="8-qr-etiket-yazdrma">8. QR etiket yazdırma</h2>
+<table>
+<thead>
+<tr>
+<th>Boyut</th>
+<th>Kullanım</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A4 · 24 etiket (70×37 mm)</td>
+<td>Standart A4 etiket kağıdı (3 sütun × 8 satır)</td>
+</tr>
+<tr>
+<td>A4 · 14 etiket (99×38 mm)</td>
+<td>2 sütun × 7 satır</td>
+</tr>
+<tr>
+<td>A4 · 8 büyük etiket (99×67 mm)</td>
+<td>Palet ve kasa için büyük etiket</td>
+</tr>
+<tr>
+<td>100×50 mm / 60×40 mm</td>
+<td>Termal etiket yazıcısı (her etiket ayrı sayfa)</td>
+</tr>
+</tbody>
+</table>
+<p>Yazdırma penceresinde <strong>Ölçek: %100 / Gerçek boyut</strong> ve <strong>Kenar boşlukları: Yok</strong> seçin. İlk baskıyı düz kağıda alıp etiket kağıdının üzerine koyarak hizayı kontrol edin.</p>
+<h2 id="9-yedekleme-ve-geri-yukleme">9. Yedekleme ve geri yükleme</h2>
+<ul>
+<li>Veritabanı her 12 saatte bir otomatik yedeklenir. Son 60 yedek <code>C:\ProgramData\DepoTakip\yedekler</code> klasöründe saklanır.</li>
+<li><strong>Ayarlar → Yedekleme</strong> ekranından istediğiniz an yedek alabilir veya yedeği indirebilirsiniz.</li>
+<li><strong>Önerimiz:</strong> Haftada bir yedek klasörünü bir USB belleğe veya başka bir bilgisayara kopyalayın.</li>
+</ul>
+<h3 id="geri-yukleme">Geri yükleme</h3>
+<ol>
+<li>Başlat menüsünde <strong>Görev Zamanlayıcı</strong>'yı açın, <strong>DepoTakip Sunucu</strong> görevine sağ tıklayıp <strong>Sonlandır</strong>'ı seçin.</li>
+<li><code>C:\ProgramData\DepoTakip</code> klasöründeki <code>depo.db</code>, <code>depo.db-wal</code> ve <code>depo.db-shm</code> dosyalarını güvenli bir yere taşıyın.</li>
+<li>Geri yüklemek istediğiniz yedek dosyasını bu klasöre kopyalayın ve adını <code>depo.db</code> yapın.</li>
+<li>Görevi sağ tıklayıp <strong>Çalıştır</strong>'ı seçin veya bilgisayarı yeniden başlatın.</li>
+</ol>
+<h3 id="baska-bilgisayara-tasma">Başka bilgisayara taşıma</h3>
+<ol>
+<li>Yeni bilgisayara Depo Takip'i kurun.</li>
+<li>Yukarıdaki geri yükleme adımlarıyla eski bilgisayardaki <code>depo.db</code> dosyasını yeni bilgisayara taşıyın.</li>
+<li>Telefonlarda <strong>Sunucu adresini değiştir</strong> seçeneğiyle yeni adresi girin.</li>
+</ol>
+<h2 id="10-sorun-giderme">10. Sorun giderme</h2>
+<table>
+<thead>
+<tr>
+<th>Sorun</th>
+<th>Çözüm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Telefon "Sunucuya bağlanılamadı" diyor</td>
+<td>Bilgisayar açık mı, uykuda mı? Telefon aynı Wi-Fi'da mı? Bilgisayarda <strong>Ayarlar → Telefon bağlantısı</strong> ekranındaki adresle telefondaki adres aynı mı?</td>
+</tr>
+<tr>
+<td>Adres değişti</td>
+<td>Bilgisayara sabit IP verin (bkz. Bölüm 2). Telefonda <strong>Menü → Sunucu adresini değiştir</strong> ile yeni QR'ı okutun.</td>
+</tr>
+<tr>
+<td>Masaüstü kısayolu açılmıyor</td>
+<td>Tarayıcıda <code>http://localhost:8765</code> adresini açmayı deneyin. Olmazsa bilgisayarı yeniden başlatın. Kayıt dosyası: <code>C:\ProgramData\DepoTakip\sunucu.log</code></td>
+</tr>
+<tr>
+<td>Kamera açılmıyor</td>
+<td>Telefon ayarlarından Depo Takip uygulamasına <strong>Kamera</strong> izni verin.</td>
+</tr>
+<tr>
+<td>Şifremi unuttum</td>
+<td>Yönetici, <strong>Ayarlar → Kullanıcılar</strong> ekranından yeni şifre belirler.</td>
+</tr>
+<tr>
+<td>Yöneticinin şifresi unutuldu</td>
+<td>Başka bir yönetici hesabı yoksa teknik destek gerekir; veritabanı dosyası bozulmadan şifre sıfırlanabilir.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11-teknik-ayrntlar">11. Teknik ayrıntılar</h2>
+<ul>
+<li><strong>Sunucu:</strong> Node.js 24 ve yerleşik SQLite (harici paket yok). Varsayılan port 8765; <code>DEPO_PORT</code> ortam değişkeniyle değiştirilebilir.</li>
+<li><strong>Veri klasörü:</strong> <code>C:\ProgramData\DepoTakip</code> (<code>depo.db</code>, <code>sunucu.log</code>, <code>yedekler\</code>).</li>
+<li><strong>Canlı senkron:</strong> Server-Sent Events. Değişiklikler tüm açık ekranlara anında iletilir.</li>
+<li><strong>Güvenlik:</strong> Şifreler scrypt ile özetlenerek saklanır. Oturum anahtarı 30 gün kullanılmazsa geçersiz olur. Sistem yalnızca yerel ağda çalışır, internete açılmaz.</li>
+<li><strong>Android:</strong> WebView tabanlı uygulama. Google Play Hizmetleri'nin QR tarayıcısını, yoksa yerleşik ZXing tarayıcıyı kullanır. Desteklenen sürüm: Android 7.0 ve üzeri.</li>
+</ul></body></html>
