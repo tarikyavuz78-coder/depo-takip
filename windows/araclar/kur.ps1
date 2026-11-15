@@ -47,6 +47,12 @@ Bilgi "Otomatik başlatma görevi oluşturuldu: $TaskName"
 & netsh.exe advfirewall firewall add rule name="Depo Takip" dir=in action=allow protocol=TCP localport=$Port profile=any | Out-Null
 Bilgi "Güvenlik duvarında TCP $Port portu açıldı"
 
+# 4b) Eski sürümden kalan, artık kullanılmayan dosyaları temizle (veriler etkilenmez)
+foreach ($f in @('server\db.js', 'server\seed-data.js', 'public\app.js')) {
+    $p = Join-Path $AppDir $f
+    if (Test-Path $p) { Remove-Item $p -Force -ErrorAction SilentlyContinue }
+}
+
 # 5) Sunucuyu (yeniden) başlat
 Get-CimInstance Win32_Process -Filter "Name='node.exe'" -ErrorAction SilentlyContinue |
     Where-Object { $_.CommandLine -like '*server\server.js*' } |

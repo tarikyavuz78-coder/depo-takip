@@ -3,7 +3,7 @@
 
 #define AppVer GetEnv("DEPO_VERSION")
 #if AppVer == ""
-  #define AppVer "1.0.0"
+  #define AppVer "2.1.0"
 #endif
 
 [Setup]

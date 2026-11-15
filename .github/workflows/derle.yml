@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 env:
-  DEPO_VERSION: 1.0.${{ github.run_number }}
+  DEPO_VERSION: 2.1.${{ github.run_number }}
 
 jobs:
   android:

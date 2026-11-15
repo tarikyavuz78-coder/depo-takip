@@ -133,7 +133,7 @@ function writeXlsx(sheets) {
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>' +
     sheets.map((s, i) => `<sheet name="${esc(String(s.name).replace(/[\\/?*[\]:]/g, ' ').slice(0, 31))}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('') +
-    '</sheets></workbook>' });
+    '</sheets><calcPr calcId="191029" fullCalcOnLoad="1"/></workbook>' });
   files.push({ name: 'xl/_rels/workbook.xml.rels', data:
     '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
     '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
@@ -166,6 +166,10 @@ function writeXlsx(sheets) {
     '<xf numFmtId="164" fontId="4" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyFont="1" applyBorder="1"/>' +
     '</cellXfs>' +
     '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
+    '<dxfs count="2">' +
+    '<dxf><font><b/><color rgb="FF9C0006"/></font><fill><patternFill><bgColor rgb="FFFFC7CE"/></patternFill></fill></dxf>' +
+    '<dxf><font><color rgb="FF006100"/></font><fill><patternFill><bgColor rgb="FFC6EFCE"/></patternFill></fill></dxf>' +
+    '</dxfs>' +
     '</styleSheet>' });
 
   sheets.forEach((s, si) => {
@@ -189,6 +193,16 @@ function writeXlsx(sheets) {
         let v = row[ci];
         const ref = colName(ci) + r;
         if (v === null || v === undefined || v === '') { cells.push(`<c r="${ref}" s="0"/>`); return; }
+        if (typeof v === 'boolean') { cells.push(`<c r="${ref}" t="b" s="0"><v>${v ? 1 : 0}</v></c>`); return; }
+        // Formül hücresi: { f: 'A5+B5', v: önbellek değeri }
+        if (v && typeof v === 'object' && 'f' in v) {
+          const cv = v.v;
+          const fx = `<f>${esc(String(v.f).replace(/^=/, ''))}</f>`;
+          if (typeof cv === 'boolean') cells.push(`<c r="${ref}" t="b" s="0">${fx}<v>${cv ? 1 : 0}</v></c>`);
+          else if (typeof cv === 'number' && isFinite(cv)) cells.push(`<c r="${ref}" s="${c.type === 'int' ? 3 : 2}">${fx}<v>${+cv.toFixed(6)}</v></c>`);
+          else cells.push(`<c r="${ref}" t="str" s="0">${fx}<v>${esc(cv ?? '')}</v></c>`);
+          return;
+        }
         const isFlag = v && typeof v === 'object' && 'v' in v;
         const st = isFlag && v.alert ? 6 : (c.type === 'int' ? 3 : 2);
         if (isFlag) v = v.v;
@@ -206,6 +220,11 @@ function writeXlsx(sheets) {
       '<cols>' + cols.map((c, ci) => `<col min="${ci + 1}" max="${ci + 1}" width="${c.width || 14}" customWidth="1"/>`).join('') + '</cols>' +
       '<sheetData>' + rowsXml.join('') + '</sheetData>' +
       (s.rows.length ? `<autoFilter ref="A${headerRow}:${lastCol}${r}"/>` : '') +
+      (s.cf && s.rows.length ? s.cf.map((x, i) => {
+        // x: { col: 'H', formula: (row) => 'H5<I5', style: 0|1 } — veri satırlarının tamamına uygulanır
+        const first = headerRow + 1;
+        return `<conditionalFormatting sqref="${x.cols.map((cc) => `${cc}${first}:${cc}${r}`).join(' ')}"><cfRule type="expression" dxfId="${x.style || 0}" priority="${i + 1}"><formula>${esc(x.formula(first))}</formula></cfRule></conditionalFormatting>`;
+      }).join('') : '') +
       '<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>' +
       '<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/>' +
       '</worksheet>';
@@ -289,4 +308,95 @@ function readXlsx(buf) {
   return rows;
 }
 
-module.exports = { writeXlsx, readXlsx, zip, unzip };
+// ---------- ÇOK SAYFALI OKUYUCU (sayfa + tablo + formül) ----------
+// Dönüş: { sheets: Map(ad -> { rows: [[{v, f}]], state }), tables: Map(ad -> { sheet, ref, r1, c1, r2, c2, cols: [ad] }) }
+function readWorkbook(buf) {
+  const files = unzip(buf);
+  const txt = (p) => (files[p] ? files[p].toString('utf8') : '');
+  const shared = [];
+  const ss = txt('xl/sharedStrings.xml');
+  if (ss) {
+    const siRe = /<si>([\s\S]*?)<\/si>/g; let m;
+    while ((m = siRe.exec(ss))) {
+      const parts = []; const tRe = /<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g; let t;
+      // fonetik (rPh) bölümlerini atla
+      const body = m[1].replace(/<rPh[\s\S]*?<\/rPh>/g, '');
+      while ((t = tRe.exec(body))) parts.push(unesc(t[1]));
+      shared.push(parts.join(''));
+    }
+  }
+  const relsOf = (p) => {
+    const dir = p.replace(/[^/]+$/, ''); const base = p.slice(dir.length);
+    const x = txt(`${dir}_rels/${base}.rels`); const out = {};
+    const re = /<Relationship\b([^>]*)\/?>/g; let m;
+    while ((m = re.exec(x))) {
+      const id = (/\bId="([^"]+)"/.exec(m[1]) || [])[1]; let target = (/\bTarget="([^"]+)"/.exec(m[1]) || [])[1];
+      if (!id || !target) continue;
+      if (target.startsWith('/')) target = target.slice(1);
+      else { const segs = (dir + target).split('/'); const st = []; for (const sgm of segs) { if (sgm === '..') st.pop(); else if (sgm !== '.') st.push(sgm); } target = st.join('/'); }
+      out[id] = target;
+    }
+    return out;
+  };
+  const wb = txt('xl/workbook.xml');
+  const wbRels = relsOf('xl/workbook.xml');
+  const sheets = new Map(); const tables = new Map();
+  const shRe = /<sheet\b([^>]*)\/>/g; let sm;
+  while ((sm = shRe.exec(wb))) {
+    const name = unesc((/\bname="([^"]*)"/.exec(sm[1]) || [])[1] || '');
+    const rid = (/\br:id="([^"]+)"/.exec(sm[1]) || [])[1];
+    const state = (/\bstate="([^"]+)"/.exec(sm[1]) || [])[1] || 'visible';
+    const path = wbRels[rid]; if (!path || !files[path]) continue;
+    const xml = txt(path);
+    const rows = [];
+    const cRe = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g; let cm;
+    while ((cm = cRe.exec(xml))) {
+      const attrs = cm[1]; const ref = (/\br="([A-Z]+)(\d+)"/.exec(attrs)); if (!ref) continue;
+      const ci = colIndex(ref[1]); const ri = Number(ref[2]) - 1;
+      const type = (/\bt="([^"]+)"/.exec(attrs) || [])[1] || 'n';
+      const inner = cm[2] || '';
+      let v = null; let f = null;
+      const fm = /<f(?:\s[^>]*)?>([\s\S]*?)<\/f>/.exec(inner); if (fm) f = unesc(fm[1]);
+      if (type === 'inlineStr') { const parts = []; const tRe = /<t(?:\s[^>]*)?>([\s\S]*?)<\/t>/g; let t; while ((t = tRe.exec(inner))) parts.push(unesc(t[1])); v = parts.join(''); }
+      else {
+        const vm = /<v>([\s\S]*?)<\/v>/.exec(inner);
+        if (vm) {
+          if (type === 's') v = shared[Number(vm[1])] ?? '';
+          else if (type === 'str') v = unesc(vm[1]);
+          else if (type === 'e') v = { err: unesc(vm[1]) };
+          else if (type === 'b') v = vm[1] === '1';
+          else v = Number(vm[1]);
+        }
+      }
+      if (v === null && f === null) continue;
+      if (!rows[ri]) rows[ri] = [];
+      rows[ri][ci] = { v, f };
+    }
+    sheets.set(name, { rows, state });
+    const sRels = relsOf(path);
+    const tpRe = /<tablePart\b[^>]*r:id="([^"]+)"/g; let tp;
+    while ((tp = tpRe.exec(xml))) {
+      const tpath = sRels[tp[1]]; const tx = txt(tpath); if (!tx) continue;
+      const tname = unesc((/<table\b[^>]*\bname="([^"]*)"/.exec(tx) || [])[1] || '');
+      const tref = (/<table\b[^>]*\bref="([^"]*)"/.exec(tx) || [])[1] || '';
+      const cols = []; const tcRe = /<tableColumn\b[^>]*\bname="([^"]*)"/g; let tc; while ((tc = tcRe.exec(tx))) cols.push(unesc(tc[1]).replace(/_x000a_/gi, '\n'));
+      const mm = /^([A-Z]+)(\d+):([A-Z]+)(\d+)$/.exec(tref);
+      if (mm) tables.set(tname, { name: tname, sheet: name, ref: tref, c1: colIndex(mm[1]), r1: Number(mm[2]) - 1, c2: colIndex(mm[3]), r2: Number(mm[4]) - 1, cols });
+    }
+  }
+  // Yardımcı: tabloyu nesne dizisi olarak oku ({sütunAdı: değer, _row})
+  const tableRows = (tname, { formulas = false } = {}) => {
+    const t = tables.get(tname); if (!t) return null;
+    const sh = sheets.get(t.sheet); const out = [];
+    for (let r = t.r1 + 1; r <= t.r2; r++) {
+      const row = sh.rows[r] || []; const o = { _row: r + 1 }; let any = false;
+      t.cols.forEach((cn, i) => { const cell = row[t.c1 + i]; const val = cell ? cell.v : null; o[cn] = val; if (formulas) o[cn + '#f'] = cell ? cell.f : null; if (val !== null && val !== '' && !(cell && cell.f)) any = true; });
+      o._any = any; out.push(o);
+    }
+    return out;
+  };
+  const cell = (sheet, addr) => { const sh = sheets.get(sheet); const m = /^([A-Z]+)(\d+)$/.exec(addr); if (!sh || !m) return null; const row = sh.rows[Number(m[2]) - 1]; return row ? row[colIndex(m[1])] || null : null; };
+  return { sheets, tables, tableRows, cell };
+}
+
+module.exports = { writeXlsx, readXlsx, readWorkbook, zip, unzip, colName, colIndex };

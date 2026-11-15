@@ -1,224 +1,311 @@
-# Depo Takip — Kurulum ve Kullanım Kılavuzu
+# Depo Takip 2.1 — Kurulum ve Kullanım Kılavuzu
 
-Sürüm 1.0
+Sürüm 2.1
 
-## 1. Sistem nasıl çalışır?
+## 2.1 sürümünde neler yeni?
 
-Depo Takip üç parçadan oluşur:
+> **Güncelleme:** Paketteki dosyaları kurulum klasörünün (`C:\DepoTakip`) üzerine kopyalayın, `Kur.bat`'a çift tıklayın. Veritabanı (`depo2.db`) olduğu gibi kalır; tüm kayıtlarınız, kullanıcılarınız ve tanımlarınız korunur. İlk açılışta otomatik yedek alınır.
 
-- **Depo bilgisayarı (sunucu).** Tüm veriler bu Windows bilgisayardaki tek bir veritabanında tutulur. Sunucu, Windows açıldığında kendiliğinden başlar; kimsenin oturum açmasına gerek yoktur.
-- **Bilgisayardaki uygulama.** Masaüstündeki **Depo Takip** kısayolu uygulamayı ayrı bir pencerede açar. Aynı ağdaki başka bilgisayarlar da tarayıcıdan `http://<depo-bilgisayarı-adresi>:8765` adresiyle girebilir.
-- **Android uygulaması.** Telefon, fabrika Wi-Fi'ı üzerinden aynı sunucuya bağlanır. QR kodlar telefonun kamerasıyla okutulur.
+**1. Beş rol ve kullanıcı bazında yetki.** Roller: **Ana yönetici** (her şey), **Depo sorumlusu** (giriş, çıkış, transfer, iade, ıskarta, sayım), **Üretim sorumlusu** (üretim, fire tartımı), **Sevkiyat sorumlusu** (sevkiyat, mamul sayımı, palet), **Rapor kullanıcısı** (yalnızca yetkili olduğu raporlar). Eski "Depocu" hesapları Depo sorumlusu, "İzleyici" hesapları Rapor kullanıcısı olur.
+Ayarlar → Kullanıcılar ve yetkiler'de bir kullanıcıyı açıp **Yetkileri özelleştir**'i işaretlerseniz her kayıt türü için **Görür / Ekler / Düzenler / Siler** yetkisini ayrı ayrı, raporları tek tek, değişiklik geçmişini (göremez / kendi / herkes), paneli ve Excel'den yüklemeyi ayrıca verebilirsiniz. Kullanıcının göremediği ekranlar menüde hiç görünmez; sunucu da her işlemde yetkiyi ayrıca kontrol eder. Kullanıcı silinebilir; işlem yapmış bir kullanıcı silinirse işlem geçmişi korunur (hesap kapatılır, adı "(silindi)" görünür).
 
-Bütün ekranlar aynı veritabanını kullanır. Bir telefonda kaydedilen hareket, birkaç saniye içinde diğer tüm ekranlara yansır.
+**2. Mamul kodları ve ürün QR etiketleri.** Her ürüne kalıcı bir mamul kodu verildi (MML-001, MML-002 …). Tanımlar → QR etiketleri'nde **Mamul** sekmesinden ürün etiketleri basılır. Ürün QR'ı okutulunca **ürün kartı** açılır: güncel mamul stoğu, bu ayın üretim ve sevkiyatı, son hareketler; karttan doğrudan Üretim (mamul girişi), Sevkiyat çıkışı ve Sayım açılır. Ürünlere **asgari mamul stoğu** girilebilir; altına inince panelde uyarı çıkar.
+
+**3. El tipi barkod okuyucu.** USB veya Bluetooth barkod okuyucular (klavye gibi çalışan) her ekranda kullanılabilir: bir yazı alanında değilken okuttuğunuz kod hammadde veya ürün kartını açar. Hammadde seçim alanlarında ve sevkiyat formunda da doğrudan çalışır.
+
+**4. Sevkiyat: müşteri, adres ve QR doğrulama.** Sevkiyat kaydına **müşteri, sevk adresi, irsaliye no, araç plakası** eklendi; aynı gün birden çok sevkiyat girilebilir. Formdaki okutma alanına gönderilen ürünlerin etiketini okutun: satır ✓ ile işaretlenir, alt satırda kaç kalemin doğrulandığı görünür ("Her okutmada +1 koli" seçeneğiyle koli koli sayarak da girebilirsiniz). Sevk miktarı mamul stoğunu aşarsa satırda ⚠ uyarısı çıkar. Sevkiyatı yapan kullanıcı ve kayıt saati otomatik tutulur.
+
+**5. Her listede "Giren" sütunu.** Tüm kayıt listelerinde kaydı giren kullanıcı ve kayıt tarihi-saati görünür.
+
+**6. Yeni panel.** Birim bazında toplam hammadde (ana + cep), üretimde kullanılan hammadde, toplam mamul stoğu, toplam üretim ve sevkiyat, **günlük üretim / sevkiyat grafiği**, hammadde ve mamul **kritik stok uyarıları**, **depolar arası dağılım** (grup bazında ana / cep oranı) ve son işlemler.
+
+**7. Geçmiş gün stok durumu.** Raporlar → Geçmiş gün stok: bir tarih seçin, o günün sonundaki ana depo, cep depo ve mamul stokları kayıtlardan yeniden hesaplanır. Excel'e de indirilebilir.
+
+**8. Yeni raporlar.** **Hammadde hareketleri** (tarih aralığında her hareket; lot, belge, firma, giren kullanıcı ve saatiyle), **Kullanıcı işlemleri** (kim, ne zaman, hangi kaydı ekledi / değiştirdi / sildi; değişen alanların eski ve yeni değeri), **Excel rapor merkezi**: tarih aralığı seçip Ana depo, Cep depo, Hammadde hareket, Hammadde stok, Üretim, Reçete kullanımı, Mamul stok, Sevkiyat, Kullanıcı işlem ve **Genel yönetici raporu**nu (hepsi tek dosyada) indirin.
+
+**9. Excel'den kayıt yükleme.** Ayarlar → Excel içe aktarma → **Excel'den kayıt yükle**: geçmiş hammadde girişleri, transferler (ana ↔ cep), iade ve ıskarta çıkışları, hammadde açılış stokları / sayımlar, üretim kayıtları, sevkiyatlar, mamul açılış stokları, fire tartımları, hammadde ve mamul listeleri.
+1. Türü seçip **Şablonu indir**'e basın. Şablonun "Açıklama" sayfasında her sütunun nasıl doldurulacağı yazar (hammadde KYN koduyla veya adıyla, ürün adıyla veya MML koduyla yazılabilir).
+2. Doldurduğunuz dosyayı bırakın. **Önizleme** gösterilir: geçerli, hatalı ve mükerrer satırlar ayrı ayrı süzülebilir.
+3. Kontroller: zorunlu alanlar, tarih (geçerli ve ileri tarih değil), miktar (sayı, sıfırdan büyük), bilinmeyen hammadde / ürün, **mükerrer kayıt** (sistemde veya dosyada aynısı varsa atlanır).
+4. **Hata raporunu indir** ile hatalı satırları açıklamalarıyla Excel olarak alın, düzeltip yeniden yükleyin; ya da "hatalı satırları atla" diyerek geçerlileri yükleyin.
+5. Yükleme öncesi otomatik yedek alınır; yükleme tek işlem olarak kaydedilir ve Değişiklik geçmişinden tek seferde geri alınır.
+Sevkiyat şablonunda her satır bir üründür; aynı tarih + müşteri + irsaliye no satırları tek sevkiyat kaydında birleşir.
+
+## 1. Ne değişti? (1.x → 2.0)
+
+Depo Takip 2.0, "Ekim 2026 Depo Stok Hammadde Raporu" Excel dosyanızdaki düzen esas alınarak baştan yazıldı.
+
+- **Excel ile aynı hesap.** Hammadde stoğu, reçeteye göre tüketim, fire, cep depo, ıskarta, ürün stoğu ve sevkiyat; Excel'deki formüllerin aynısıyla hesaplanır.
+- **Kayıt türleri Excel sayfalarıyla aynı:** Üretim Raporu, Satınalma, Cep Depoya Verilen, Sevkiyat, Tedarikçiye İade, Iskarta, Hammadde Sayımı, Ürün Sayımı, Fire Tartımı, Palet Takibi.
+- **Her şeyi siz değiştirebilirsiniz:** hammaddeler, gruplar, ürünler, reçeteler, hatlar, kapasiteler, koli ve palet tipleri, preform firmaları, vardiyalar, personel ve formlardaki alanlar.
+- **Geri al / Yinele.** Yapılan her ekleme, değişiklik ve silme kaydedilir ve tek tıkla geri alınabilir. Geri almanın kendisi de geri alınabilir.
+- **Ay seçimi.** Üst çubuktaki ay seçiciyle tüm kayıtlar ve raporlar seçtiğiniz aya göre gösterilir.
+- **Excel'den içe aktarma.** Aylık Excel raporunuzu yükleyerek o ayın tüm kayıtlarını tek seferde aktarabilirsiniz.
+
+## 2. Sistem nasıl çalışır?
+
+- **Depo bilgisayarı (sunucu):** Tüm veriler bu Windows bilgisayarda tek bir veritabanında durur. Sunucu Windows açılınca kendiliğinden başlar.
+- **Bilgisayardan kullanım:** Masaüstündeki **Depo Takip** kısayolu veya aynı ağdaki başka bir bilgisayarda tarayıcıdan `http://<depo-bilgisayarı-adresi>:8765`.
+- **Android telefon:** Aynı modeme bağlı telefon, sunucuya bağlanır. QR kodlar kamerayla okutulur.
+
+Bir ekranda yapılan kayıt birkaç saniye içinde tüm ekranlara yansır (üst çubukta yeşil **Canlı** işareti).
 
 ### Stok nasıl hesaplanır?
 
-Stok miktarı elle değiştirilen bir sayı değildir. Her işlem (giriş, transfer, üretime çıkış, fire, iade, sayım) ayrı bir **hareket kaydı** olarak saklanır. Kalan stok bu kayıtlardan otomatik hesaplanır:
+Stok elle yazılan bir sayı değildir; kayıtlardan her seferinde yeniden hesaplanır:
 
-> Kalan stok = Girişler + İadeler − Üretime verilenler − Fireler ± Sayım düzeltmeleri
+> **Kalan = Devreden − (Kullanılan + Fire) + Satın alınan − İade ± Sayım farkı − İmha**
+>
+> **Kullanılabilen = Kalan − Iskartaya ayrılan**
 
-Transfer, Ham Depo ile Cep Depo arasında yer değiştirir; toplam stoğu değiştirmez.
+- **Kullanılan ve fire**, her üretim kaydı ürünün reçetesiyle çarpılarak bulunur (bkz. Bölüm 6).
+- **Cep depoya verilen**, ana depodan cep depoya geçen miktardır; toplam stoğu değiştirmez, yalnızca ana/cep ayrımını değiştirir. Üretimdeki tüketim cep depodan düşülür.
+- **Sayım**, o depodaki miktarı sayılan değere eşitler; fark otomatik hesaplanır.
+- **Iskarta**: "Ayrıldı" iken kullanılabilir stoktan düşer, "İmha edildi" olunca stoktan tamamen düşer, "Kapandı" olunca etkisi kalkar.
+- **Asgari stok uyarısı:** Kullanılabilen miktar asgari stoğun altına inince "Sipariş ver", sıfıra inince "Tükendi" uyarısı verilir.
 
-Hareketler **silinemez**. Hatalı bir kayıt, yönetici tarafından **iptal** edilir. İptal, ters yönde yeni bir kayıt oluşturur; iki kayıt da geçmişte görünür. Böylece her değişikliğin kim tarafından, ne zaman ve neden yapıldığı izlenebilir.
+## 3. Kurulum ve güncelleme (Windows)
 
-### Depolar
+### 1.x sürümünden 2.0'a güncelleme
 
-| Depo | Kullanım |
-|---|---|
-| **Ham Depo** | Tedarikçiden gelen malzemenin girdiği ana depo |
-| **Cep Depo** | Üretim hattının yanındaki ara depo; üretime çıkışlar varsayılan olarak buradan düşülür |
+1. Güncelleme paketindeki `DepoTakip` klasörünün içindekileri, mevcut kurulum klasörünün (örneğin `C:\DepoTakip`) **üzerine** kopyalayın ve "Dosyaları değiştir" deyin.
+2. `Kur.bat` dosyasına çift tıklayıp yönetici iznini onaylayın.
+3. Depo Takip'i açın. **Eski kullanıcı adınız ve şifrenizle** giriş yapın.
 
-### KYN kodları ve QR
+İlk açılışta otomatik olarak şunlar olur:
 
-Her hammaddenin kalıcı bir kodu vardır: `KYN-<KATEGORİ>-<SIRA>`. Örneğin `KYN-PRF-003` = 0,5 L Preform. QR kodun içinde yalnızca bu kod bulunur. Ürünün adı değişse bile etiketi yeniden basmanız gerekmez. Silinen bir kodun numarası başka bir ürüne verilmez.
+- 2.0 yeni bir veritabanı dosyası kullanır (`depo2.db`). Eski veritabanı (`depo.db`) **silinmez, değiştirilmez**; aynı klasörde durur.
+- Kullanıcılar ve firma adı eski sürümden aktarılır.
+- 22 grup, 121 hammadde (KYN kodlarıyla), 14 ürün, 428 satırlık reçeteler, hatlar, kapasiteler, koli/palet tipleri, preform firmaları, vardiyalar ve personel Ekim 2026 Excel dosyanızdan hazır yüklenir.
 
-| Kod | Kategori | Kod | Kategori |
-|---|---|---|---|
-| PRF | Preform | TUT | Tutkal |
-| KPK | Kapak | BNT | Bant |
-| KLP | Kulp / Handle | CAM | Cam Şişe |
-| ETK | Etiket | GDA | Gıda Hammaddesi ve Katkı |
-| BRD | Bardak Su Ambalajı | KOD | Kodlama Sarfı |
-| FLM | Shrink / Stretch Film | KAY | Bant Kaydırıcı |
-| KOL | Koli | TMZ | Temizlik ve Dezenfeksiyon |
-| PLT | Palet ve Ara Malzeme | | |
+Ardından yapılacaklar:
 
-Sistem 120 hammaddeyle hazır gelir. Yeni kalem ve yeni kategori eklenebilir.
+1. **Ekim kayıtlarını aktarın:** Ayarlar → Excel içe aktarma → Ekim Excel dosyanızı yükleyin (bkz. Bölüm 8).
+2. (İsteğe bağlı) **Eski stokları aktarın:** Ayarlar → Excel içe aktarma → "Eski sürümden (1.x) aktar". Eski KYN kodları yeni hammaddelerle eşleştirilir; eski QR etiketleri okutulduğunda doğru hammadde açılır. Ekim Excel'ini aktardıysanız stokları ayrıca aktarmanıza gerek yoktur (devreden stoklar Excel'den gelir); yalnızca kod eşleştirmesi için kutuyu işaretlemeden çalıştırabilirsiniz.
 
-### Kullanıcı yetkileri
+### Yeni kurulum
 
-| Yetki | Yapabilecekleri |
-|---|---|
-| **Yönetici** | Her şey: hammadde kartları, asgari seviyeler, sayım düzeltme, hareket iptali, kullanıcılar, Excel'den içe aktarma, yedekleme |
-| **Depocu** | Giriş, transfer, üretime çıkış, fire ve iade kaydı; stokları ve raporları görme |
-| **İzleyici** | Yalnızca görüntüleme ve rapor alma |
+1. https://nodejs.org adresinden **LTS** sürümünü (24.x) indirip kurun.
+2. Paketteki `DepoTakip` klasörünü `C:\DepoTakip` konumuna kopyalayın.
+3. `Kur.bat` dosyasına çift tıklayın, yönetici iznini onaylayın.
+4. Açılan **İlk kurulum** ekranında firma adını ve yönetici hesabını oluşturun.
 
-## 2. Windows kurulumu (depo bilgisayarı)
-
-### Kurulum sihirbazıyla (önerilen)
-
-1. `DepoTakip-Kurulum-x.y.z.exe` dosyasını depo bilgisayarına kopyalayıp çalıştırın.
-2. Windows **"Bu uygulamanın değişiklik yapmasına izin verilsin mi?"** diye sorarsa **Evet** deyin.
-3. Kurulum bittiğinde Depo Takip açılır ve **İlk Kurulum** ekranı gelir.
-4. Firma adını, kendi adınızı, kullanıcı adınızı ve şifrenizi girin. Bu hesap **Yönetici** hesabıdır.
-
-Kurulum sihirbazı şunları otomatik yapar:
-
-- Programı `C:\Program Files\DepoTakip` klasörüne kurar.
-- Sunucuyu Windows açılışında başlayacak şekilde ayarlar. Kapanırsa bir dakika içinde yeniden başlar.
-- Telefonların bağlanabilmesi için Windows Güvenlik Duvarı'nda 8765 numaralı portu açar.
-- Masaüstüne ve Başlat menüsüne **Depo Takip** kısayolu ekler.
-
-Ayrıca bir programın (Node.js vb.) kurulmasına gerek yoktur; gerekli her şey kurulum dosyasının içindedir.
-
-### Taşınabilir paketle (alternatif)
-
-1. `DepoTakip-Tasinabilir-x.y.z.zip` dosyasını `C:\DepoTakip` gibi kalıcı bir klasöre çıkarın. **İndirilenler** klasöründe bırakmayın.
-2. Klasördeki `Kur.bat` dosyasına çift tıklayın ve yönetici iznini onaylayın.
+`Kur.bat` şunları yapar: sunucuyu Windows açılışında başlayacak şekilde ayarlar (kapanırsa 1 dakika içinde yeniden başlar), güvenlik duvarında 8765 portunu açar, masaüstüne kısayol ekler.
 
 ### Bilgisayar için önemli ayarlar
 
-- **Uyku modunu kapatın.** Denetim Masası → Güç Seçenekleri bölümünde **Bilgisayarı uyku moduna geçir: Hiçbir zaman** seçin. Bilgisayar uyursa telefonlar bağlanamaz.
-- **Sabit IP verin.** Modem arayüzünde bu bilgisayara **DHCP rezervasyonu (sabit IP)** tanımlayın. Böylece telefonlardaki adres hiç değişmez. Bu ayar için IT sorumlunuzdan veya modem kılavuzundan yardım alabilirsiniz.
+- **Uyku modunu kapatın** (Güç Seçenekleri → Bilgisayarı uyku moduna geçir: Hiçbir zaman).
+- **Sabit IP verin.** Modem arayüzünde bu bilgisayara DHCP rezervasyonu tanımlayın; böylece telefonlardaki adres değişmez.
 
-## 3. Android telefona kurulum
+## 4. Telefonu bağlama
 
-1. `DepoTakip-x.y.z.apk` dosyasını telefona aktarın. Bunun için WhatsApp, e-posta, USB kablo veya Google Drive kullanabilirsiniz.
-2. Dosyaya dokunun. Telefon **"Bilinmeyen uygulamalar"** uyarısı verirse, açılan ekrandan **Bu kaynağa izin ver** seçeneğini açın ve **Yükle**'ye dokunun.
-3. Play Protect uyarısı çıkarsa **Yine de yükle**'yi seçin. Uygulama firmanıza özeldir, Play Store'da yer almaz.
-4. Uygulamayı açın. Bildirim izni istenirse **İzin ver** deyin; stok uyarıları bu sayede telefona gelir.
-5. Bilgisayarda **Ayarlar → Telefon bağlantısı** ekranını açın.
-6. Telefonda **Sunucuyu QR ile bul**'a dokunup ekrandaki QR kodu okutun. İsterseniz adresi elle de yazabilirsiniz, örneğin `192.168.1.20`.
-7. Kendi kullanıcı adınız ve şifrenizle giriş yapın.
+1. Telefon, bilgisayarın bağlı olduğu **modemin Wi-Fi'ına** bağlı olsun. Bilgisayarın kabloyla bağlı olması sorun değildir; aynı modem yeterlidir.
+2. Bilgisayarda **Ayarlar → Telefon bağlantısı** ekranını açın.
+3. Telefonda Depo Takip uygulamasında **Sunucuyu QR ile bul**'a dokunup ekrandaki kodu okutun (veya adresi elle yazın).
+4. Kendi kullanıcı adınızla giriş yapın.
 
-Telefon ile bilgisayar **aynı Wi-Fi ağında** olmalıdır. Telefonda mobil veri açık olsa bile sorun olmaz.
+Android uygulaması (APK) henüz kurulu değilse telefonun tarayıcısında (Chrome) `http://<adres>:8765` adresini açıp menüden **Ana ekrana ekle** diyerek de kullanabilirsiniz. Bu durumda QR okutma yerine KYN kodunu yazarak arama yapılır.
 
-Daha sonra uygulamayı güncellemek için yeni APK'yı aynı şekilde kurmanız yeterlidir. Veriler sunucuda durduğu için hiçbir şey kaybolmaz.
+Telefon bağlanamıyorsa: modemde "misafir ağı" veya "AP / istemci yalıtımı" kapalı olmalı; Windows'ta ağ profili **Özel ağ** olmalı; güvenlik duvarında 8765 izni olmalı (`Kur.bat` ekler). Telefondan tarayıcıyla `http://<adres>:8765` açılıyorsa bağlantı doğrudur.
 
-## 4. İlk ayarlar (yalnızca bir kez)
+## 5. Ekranlar
 
-1. **Kullanıcıları ekleyin.** **Ayarlar → Kullanıcılar → Yeni kullanıcı** yolunu izleyin. Her çalışana ayrı hesap açın ki hareket kayıtlarında kimin ne yaptığı görünsün.
-2. **Açılış stoklarını ve asgari seviyeleri girin:**
-   1. **Ayarlar → Excel ile toplu giriş → Excel şablonunu indir** düğmesine basın.
-   2. Şablonu açın. Her satırda bir hammadde vardır.
-      - **Ham Depo Sayım** ve **Cep Depo Sayım** sütunlarına depoda saydığınız miktarı yazın.
-      - **Asgari Stok (Toplam)** sütununa iki deponun toplamı için alt sınırı yazın. Stok bu sınıra inince uyarı verilir.
-      - **Cep Asgari** sütununa Cep Depo için alt sınırı yazın. Bu sınırın altına inilince "Cep depoya transfer gerekli" uyarısı verilir. Bu sütun isteğe bağlıdır.
-      - Boş bıraktığınız hücreler değiştirilmez.
-   3. Dosyayı kaydedip aynı ekrandan yükleyin. Önce bir önizleme gösterilir; **Kaydet**'e basmadan hiçbir şey değişmez.
-3. **QR etiketlerini basın.** **QR Etiketleri** ekranında hammaddeleri seçin, etiket boyutunu belirleyin ve **Yazdır**'a basın. Etiketleri raflara, kasalara veya paletlere yapıştırın.
-
-Şablonu istediğiniz zaman yeniden indirip kullanabilirsiniz. Örneğin ay sonu sayımları için de aynı yöntem geçerlidir.
-
-## 5. Günlük kullanım
-
-### QR okutarak ürün bulma
-
-**QR Okut** düğmesine (telefonda alttaki ortadaki düğme) dokunun ve etiketi okutun. Ürünün Ham, Cep ve Toplam stoğu görünür. Buradan doğrudan **Giriş**, **Transfer**, **Üretim**, **Fire** veya **İade** işlemine geçebilirsiniz.
-
-Bilgisayarda USB veya Bluetooth barkod okuyucu kullanıyorsanız, herhangi bir ekranda etiketi okutmanız yeterlidir; ürün kartı açılır.
-
-### İşlem türleri
-
-| İşlem | Ne zaman? | Varsayılan depo |
-|---|---|---|
-| **Giriş** | Tedarikçiden malzeme geldiğinde | Ham Depo'ya girer |
-| **Transfer** | Ham Depo'dan Cep Depo'ya veya tersine taşırken | Ham → Cep |
-| **Üretime Çıkış** | Hatta malzeme verildiğinde | Cep Depo'dan düşer |
-| **Fire** | Malzeme kullanılamaz hale geldiğinde (neden yazmak zorunludur) | Cep Depo'dan düşer |
-| **İade** | Üretimde kullanılmayan malzeme geri geldiğinde | Cep Depo'ya girer |
-| **Sayım** | Fiili sayım sistemle tutmadığında (yalnızca Yönetici) | Seçilen depo |
-
-Depoyu her işlemde değiştirebilirsiniz.
-
-### Birden çok kalemi tek seferde kaydetme
-
-Aynı irsaliyeyle birden fazla kalem geldiyse şöyle ilerleyin:
-
-1. İrsaliye numarasını ve tedarikçiyi bir kez yazın.
-2. İlk hammaddeyi seçip miktarını girin, **Listeye ekle**'ye basın.
-3. Diğer kalemler için aynı adımı tekrarlayın.
-4. **Kaydet**'e basın. Hepsi tek seferde kaydedilir; biri hatalıysa hiçbiri kaydedilmez.
-
-### Yetersiz stok koruması
-
-Bir depodan, o depodaki mevcut miktardan fazla çıkış yapılamaz. Sistem uyarı verir ve kaydı reddeder. Gerçek stok farklıysa yönetici **Sayım** ile düzeltir.
-
-### Wi-Fi koparsa
-
-Bağlantı yokken telefonda kaydettiğiniz işlemler kaybolmaz. Telefonda bekletilir ve bağlantı gelince otomatik gönderilir. Üst çubukta **"x bekleyen"** yazısı görünür. Sunucu bir işlemi kabul etmezse (örneğin stok o arada bittiyse), ekranda **"reddedildi"** uyarısı çıkar; işlemi kontrol edip yeniden girin.
-
-### Hatalı kaydı düzeltme
-
-Yönetici, **Hareket Geçmişi** ekranında ilgili satırdaki **İptal** düğmesine basar ve iptal nedenini yazar. Ardından doğru kayıt yeniden girilir.
-
-## 6. Stok uyarıları
-
-| Durum | Anlamı |
+| Bölüm | İçerik |
 |---|---|
-| **Kritik** | İki deponun toplamı asgari stok seviyesine eşit veya altında |
-| **Tükendi** | Asgari seviyesi tanımlı bir kalemin stoğu sıfır |
-| **Transfer gerekli** | Cep Depo, Cep Asgari seviyesinin altında ama Ham Depo'da stok var |
+| **Panel** | Ayın özeti: üretilen ve sevk edilen koli, fire oranı, stok uyarıları, ürün bazında üretim, son değişiklikler, hızlı kayıt düğmeleri |
+| **QR okut** | Etiketteki QR'ı okutun veya KYN kodunu yazın → hammadde kartı açılır |
+| **Kayıtlar** | Excel sayfalarına karşılık gelen kayıt listeleri (seçili aya göre) |
+| **Raporlar** | Hammadde Stok, Aylık Takip (TRK), Ürün Stok, Üretim Özeti, Reçete Kullanımı, Sevkiyat |
+| **Tanımlar** | Hammaddeler, Reçeteler, Ürünler, Gruplar, hat/palet/koli/vardiya/personel, Form alanları, QR etiketleri |
+| **Değişiklik geçmişi** | Tüm işlemler; Geri al / Yinele |
+| **Ayarlar** | Firma ve tır ayarları, telefon bağlantısı, kullanıcılar, Excel içe aktarma, yedekleme |
 
-Bir kalem bu durumlardan birine girdiğinde, hareketi kim girmiş olursa olsun açık olan tüm ekranlarda uyarı çıkar. Telefonda Android bildirimi de gelir. Zil simgesindeki sayı, uyarıdaki kalem sayısını gösterir.
+Telefonda alt çubuk: Panel · Kayıt · QR · Stok · Menü.
 
-**Tahmini yeterlilik**, son 30 günün ortalama tüketimine (üretim + fire) göre mevcut stoğun kaç gün yeteceğini gösterir.
+### Ay seçici
 
-## 7. Raporlar ve Excel
+Üst çubuktaki **‹ Ekim 2026 ›** ile ay değiştirilir. Kayıt listeleri ve raporlar seçili ayı gösterir. Yeni kayıtta tarih, seçili ay bu aysa bugünün tarihi olarak gelir.
 
-- **Stok Durumu:** Tüm kalemlerin Ham, Cep ve Toplam stoğu; asgari seviyeleri, durumları ve tahmini yeterlilik süreleri.
-- **Stok Uyarıları:** Uyarıdaki kalemler ve asgari seviyeye ulaşmak için eksik miktar.
-- **Dönem Raporu:** Seçilen tarih aralığında her kalem için şu bilgiler: dönem başı, giriş, Cep'e transfer, üretime verilen, iade, fire, fire oranı, sayım farkı ve dönem sonu. Excel dosyasının ikinci sayfasında dönemin tüm hareketleri yer alır.
-- **Hareket Geçmişi:** Tarih, işlem türü, depo, kullanıcı ve metin filtreleriyle; filtrelenmiş liste Excel'e aktarılabilir.
+## 6. Günlük kullanım
 
-Excel dosyaları bilgisayarda **İndirilenler** klasörüne, telefonda **İndirilenler** (Download) klasörüne kaydedilir.
+### Kayıt ekleme
 
-## 8. QR etiket yazdırma
+Kayıt listesinde **Yeni kayıt**'a basın, formu doldurun, **Kaydet**'e basın. Art arda kayıt girerken **Kaydet ve yeni** tarih, vardiya, hat, ürün gibi alanları koruyarak yeni form açar. Bir kaydı düzeltmek için listede satıra tıklayın. **Kopyala** aynı bilgilerle yeni kayıt açar.
+
+Hammadde alanlarına yazmaya başlayınca liste süzülür (ad veya KYN koduyla). Yanındaki QR düğmesiyle etiket okutarak da seçebilirsiniz.
+
+### Üretim Raporu
+
+Excel'deki Üretim Raporu sayfasının karşılığıdır. Formun üstündeki yeşil şerit **toplam koli, verim, toplam fire ve sayaç farkını** siz yazarken hesaplar.
+
+- **Ürün** seçilince Preform / Kapak / Etiket seçenekleri o ürünün reçetesindekilerle sınırlanır.
+- **Toplam koli = Standart palet × koli/palet + İhracat paleti × koli/palet + Euro palet × koli/palet + Paletsiz koli.** Koli/palet değerleri Tanımlar → Palet tipleri'nden gelir.
+- **Verim = Net üretim ÷ (hat kapasitesi × süre ÷ 60).** Kapasite Tanımlar → Hat kapasiteleri'nden gelir.
+- Kaydedilen her üretim, reçeteye göre hammadde tüketimi ve fire olarak cep depodan düşülür.
+
+### Reçete nasıl uygulanır?
+
+Her reçete satırı için:
+
+- **Kullanılan = Hesap tabanı × Miktar.** Taban; üretilen toplam koli, paletsiz koli veya seçilen palet türlerinin sayısıdır.
+- **"Ne zaman kullanılır?"** Her üretimde, ya da üretim kaydında bu preform / kapak / etiket seçildiyse, ya da üretim belirli bir hatta yapıldıysa.
+- **Fire = seçilen fire alanlarının toplamı × fire çarpanı.** Örneğin shrink firesi gram girildiği için çarpan 0,001'dir (kg'a çevirir).
+- **Hesaba katılır** kutusu kapalı satırlar hesaplanmaz (silmeden devre dışı bırakmak için).
+
+### Satınalma, Cep Depo, İade, Iskarta, Sayım
+
+- **Satınalma:** irsaliye tarihi ve no, firma, lot no, hammaddenin üretim ve son kullanma tarihi, fiyat ve döviz girilebilir.
+- **Cep Depoya Verilen:** ana depodan cep depoya verilen miktar. "Yön" ile cep depodan ana depoya geri dönüş de girilebilir.
+- **Tedarikçiye İade:** ana depodan düşer.
+- **Iskarta:** kullanılamaz malzeme. Durumu sonradan "İmha edildi" veya "Kapandı" yapılabilir.
+- **Hammadde Sayımı:** depo (ana/cep) ve sayılan miktar. Listede "Fark" sütunu, sayım anındaki sistem stoğuyla farkı gösterir.
+
+### Sevkiyat
+
+Her gün için tek kayıt: tüm ürünler tek tabloda, yurtiçi ve ihracat koli sayıları yan yana. Palet, kg ve tır sayısı otomatik hesaplanır (ürünlerin koli/palet ve kg değerlerinden; tır kapasiteleri Ayarlar → Genel'de).
+
+### Ürün Sayımı
+
+Ürün stoğunun (koli) açılışı ve ay sonu sayımları için. Ürün Stok raporundaki K (mevcut) değeri buradan gelir.
+
+## 7. Geri al ve değişiklik geçmişi
+
+- Her kayıttan sonra altta çıkan bildirimdeki **Geri al** düğmesi, o işlemi geri alır.
+- Üst çubuktaki **↶** düğmesi (veya bilgisayarda **Ctrl+Z**) **kendi son işleminizi** geri alır.
+- **Değişiklik geçmişi** ekranında tüm işlemler görünür: kim, ne zaman, hangi alanı neyden neye değiştirdi. Her satırda **Geri al** düğmesi vardır.
+- Geri alınan bir işlem **Yinele** ile geri getirilir.
+- Excel içe aktarma gibi toplu işlemler tek seferde geri alınır.
+- Kayıt, geri almak istediğiniz işlemden sonra başka biri tarafından değiştirildiyse uyarı verilir; önce sonraki değişikliği geri alın (yönetici isterse yine de geri alabilir).
+- **Depocu** yalnızca kendi kayıt işlemlerini geri alabilir; tanım değişikliklerini ve başkalarının işlemlerini yönetici geri alır.
+
+Silinen kayıt gerçekten yok olmaz; Değişiklik geçmişinden geri getirilebilir.
+
+## 8. Excel ile çalışma
+
+### Aylık Excel raporunu içe aktarma
+
+**Ayarlar → Excel içe aktarma** ekranına aylık "Depo Stok Hammadde Raporu" dosyanızı bırakın.
+
+1. Önce **özet** gösterilir: kaç üretim, satınalma, cep, iade, ıskarta ve sevkiyat kaydı bulunduğu, dikkat edilmesi gerekenler ve Excel reçetesinde bulunan hatalar.
+2. Seçenekler:
+   - **Bu ayın mevcut kayıtlarını silip dosyadakilerle değiştir:** aynı ayı ikinci kez yüklerken çift kayıt oluşmasını önler.
+   - **Devreden stokları önceki ayın son gününe sayım olarak işle:** Excel'deki "Devreden" sütunu ay başı stoğu olur.
+   - **Tanımları da güncelle:** reçeteleri, asgari stokları, palet/koli tiplerini Excel'dekiyle değiştirir. Uygulamada tanım değişikliği yaptıysanız işaretlemeyin.
+3. **İçe aktar**'a basın. Aktarmadan önce otomatik yedek alınır; aktarma tek tıkla geri alınabilir.
+
+### Ekim 2026 dosyanız için notlar
+
+Ekim dosyanız incelendi ve uygulama sonuçları Excel ile karşılaştırıldı: 121 hammaddenin 118'inde tüm sütunlar birebir aynı. Farklar ve sebepleri:
+
+- **Excel reçetesindeki etiket hataları düzeltildi.** 0,5 L Fontera, 0,5 L UNO, 1,5 L Fontera, 19 L Damacana Karapınar ve Eskipazar etiket satırları Excel'de "Kapak Tipi" sütununa bağlıydı; bu yüzden Excel bu etiketlerin tüketimini hiç hesaplamıyordu. Uygulamada etiket seçimine bağlandı. Bu nedenle **1,5 L Fontera Etiket** (+45.360 adet) ve **19 L Damacana Karapınar Etiket** (+29.950 adet) tüketimi Excel'den fazla görünür; uygulamadaki değer doğrudur.
+- **Laboratuvar Hijyen Sıvısı** reçetede kullanılıyor ama hammadde listesinde yoktu; Temizlik Kimyasalı grubuna eklendi.
+- **UF Dezenfektan ve Aromalı Sistem Temizlik HCl** satırları Excel'de kapak sütununa bağlı olduğu için hiç hesaplanmıyordu. Sonuç aynı kalsın diye "hesaba katılmaz" olarak alındı. Bu kimyasalların tüketimini izlemek isterseniz Reçeteler ekranında ilgili satırı açıp "Ne zaman" = Her üretimde ve "Hesaba katılır" seçin.
+- **Eylül tarihli kayıtlar:** Cep sayfasında 23, İade sayfasında 1 kayıt Eylül tarihliydi (yazım hatası). Excel bunları Ekim'e kattığı için 1 Ekim'e alındı; asıl tarih açıklama alanına yazıldı.
+- **Kaymış satırlar:** Üretim Raporu'nda 7 satırda preform / kapak / etiket sütunları kaymış görünüyor (örneğin preform sütununda "Dmcn" yazıyor). Bu satırlarda açıklamada "Excel preform: …" notu var; ilgili üretim kaydını açıp malzemeleri seçerek düzeltebilirsiniz.
+
+### Excel çıktıları
+
+- Her kayıt listesi ve raporda **Excel** düğmesi vardır. Rapor dosyalarında toplamlar ve hesaplı sütunlar **formüllüdür** (Excel'de değer değiştirirseniz sonuç güncellenir); asgari altı satırlar kırmızı işaretlenir.
+- **Panel → Aylık Excel raporu:** Hammadde, Aylık Takip, Ürün Stok, Üretim Özeti, Reçete Kullanımı, Sevkiyat ve ayın tüm kayıt listeleri tek dosyada.
+
+### Sayım şablonu
+
+1. **Hammadde Stok** raporunda veya Ayarlar → Excel içe aktarma'da **Sayım şablonu**'nu indirin.
+2. "Ana Depo Sayım" ve "Cep Depo Sayım" sütunlarına saydığınızı yazın (boş hücreler değiştirilmez). "Asgari Stok" sütununu değiştirirseniz asgari stok da güncellenir.
+3. Sayım tarihini seçip dosyayı yükleyin. Önizlemede farkları kontrol edip **Uygula**'ya basın.
+
+## 9. Raporlar
+
+| Rapor | Açıklama |
+|---|---|
+| **Hammadde Stok** | Excel "Hammadde" sayfası: devreden, kullanılan, fire, satın alınan, iade, sayım farkı, kalan, ıskarta, kullanılabilen, ana/cep depo, yaklaşık koli, asgari ve durum. Satıra tıklayınca hammadde kartı açılır. |
+| **Aylık Takip (TRK)** | TRK şablonunuzun A–J sütunları: A devreden ana depo, B alım, C = A+B, D cep depoya verilen, E kalan ana depo, F asgari, G üretilen, H fire, I = G+H, J = (D = I) karşılaştırması. |
+| **Ürün Stok** | TRK şablonunun K–O sütunları: K mevcut (devir), G üretilen, L = K+G, M sevk, N kalan, fark. |
+| **Üretim Özeti** | Ürün, hat, vardiya ve gün bazında giren, net, koli, palet, fireler ve verim. |
+| **Reçete Kullanımı** | Her ürün için reçete satırı bazında kullanılan, fire ve fire oranı. |
+| **Sevkiyat** | Ürün ve gün bazında koli, palet, kg ve tır. |
+
+**Hammadde kartı:** güncel ana/cep/kalan/kullanılabilen stok, ay özeti, hammaddenin geçtiği reçeteler ve yürüyen bakiyeli hareket listesi. Karttan doğrudan satınalma, cep, sayım, iade ve ıskarta kaydı açılabilir; QR etiketi yazdırılabilir.
+
+> **Not:** Excel dosyanızda bazı kalemler (örneğin preformlar) için "Cep Depoya Verilen" kaydı tutulmuyor. Bu kalemlerde cep depo eksi görünür ve Aylık Takip'te J = YANLIŞ çıkar. Toplam stok (Kalan) yine doğrudur. Ana/cep ayrımının doğru görünmesi için üretime verilen miktarları Cep Depoya Verilen olarak girin.
+
+## 10. Kendi düzeninizi kurun (tanımlar)
+
+Tanımları yalnızca **yönetici** değiştirebilir. Her değişiklik Değişiklik geçmişinde görünür ve geri alınabilir.
+
+- **Hammaddeler:** yeni hammadde eklerken grup seçin; KYN kodu otomatik verilir (KYN-PRF-010 gibi) ve değişmez. Asgari stok, öncelikli ürün (yaklaşık koli hesabı için), tedarikçi, gramaj girilebilir. Kullanılmayan hammaddeyi silmek yerine **Aktif** kutusunu kapatabilirsiniz.
+- **Gruplar:** grup adı, kodu (KYN kodlarında kullanılır) ve varsayılan birim.
+- **Ürünler:** kg/koli, sevkiyatta koli/palet, kg/palet, ihracat koli/palet.
+- **Reçeteler:** ürünü seçin; satır ekleyin, düzenleyin, sırasını değiştirin veya **Başka üründen kopyala** ile başka bir ürünün reçetesini kopyalayın.
+- **Hat, palet, koli…:** hatlar, hat kapasiteleri (adet/saat), koli tipleri, palet tipleri (koli/palet), preform firmaları, vardiyalar, personel.
+
+### Form alanları
+
+**Tanımlar → Form alanları** ekranında kayıt türünü seçin:
+
+- **Yeni alan** ekleyin: metin, sayı, tarih, seçim listesi, evet/hayır veya uzun metin. Örneğin Satınalma'ya "Araç plakası". Yeni alan formda ve Excel listelerinde görünür.
+- Hazır alanların **adını değiştirin**, **gizleyin**, **zorunlu** yapın veya **listede gösterin**.
+- **Formu önizle** ile sonucu hemen görün.
+- Eklediğiniz bir alanı silmek, eski kayıtlardaki değerleri silmez.
+
+## 11. Kullanıcılar ve yetkiler
+
+| Yetki | Yapabilecekleri |
+|---|---|
+| **Ana yönetici** | Her şey: kayıtlar, tanımlar, form alanları, kullanıcılar ve yetkiler, Excel içe aktarma, yedekleme, tüm işlemleri geri alma |
+| **Depo sorumlusu** | Satınalma, cep depo transferi, iade, ıskarta, hammadde sayımı (ekler / düzenler / siler); üretim ve sevkiyatı görür; depo raporları |
+| **Üretim sorumlusu** | Üretim raporu ve fire tartımı (ekler / düzenler / siler); mamul ve hammadde sayımı ekler; üretim raporları |
+| **Sevkiyat sorumlusu** | Sevkiyat, mamul sayımı, palet takibi; mamul stok ve sevkiyat raporları |
+| **Rapor kullanıcısı** | Yalnızca görüntüler ve yetkili olduğu raporları Excel'e indirir |
+
+Bunlar rollerin varsayılanıdır; her kullanıcı için **Yetkileri özelleştir** ile değiştirilebilir (bkz. 2.1 yenilikleri, madde 1). Kendi kayıt işlemini geri alma, o kayıt türünde düzenleme veya silme yetkisi gerektirir.
+
+Kullanıcılar **Ayarlar → Kullanıcılar** ekranından eklenir; şifre de buradan sıfırlanır.
+
+## 12. QR etiketleri
+
+**Tanımlar → QR etiketleri** ekranında hammaddeleri seçin, boyutu belirleyin, **Yazdır**'a basın. Tek bir hammaddenin etiketi hammadde kartındaki **Etiket** düğmesiyle de basılabilir.
 
 | Boyut | Kullanım |
 |---|---|
-| A4 · 24 etiket (70×37 mm) | Standart A4 etiket kağıdı (3 sütun × 8 satır) |
-| A4 · 14 etiket (99×38 mm) | 2 sütun × 7 satır |
-| A4 · 8 büyük etiket (99×67 mm) | Palet ve kasa için büyük etiket |
-| 100×50 mm / 60×40 mm | Termal etiket yazıcısı (her etiket ayrı sayfa) |
+| A4 · 24 etiket (70×37 mm) | Standart A4 etiket kağıdı (3 × 8) |
+| A4 · 14 etiket (99×38 mm) | 2 × 7 |
+| A4 · 8 büyük etiket (99×67 mm) | Palet ve kasa |
+| 100×50 mm / 60×40 mm | Termal etiket yazıcısı |
 
-Yazdırma penceresinde **Ölçek: %100 / Gerçek boyut** ve **Kenar boşlukları: Yok** seçin. İlk baskıyı düz kağıda alıp etiket kağıdının üzerine koyarak hizayı kontrol edin.
+Yazdırırken **Ölçek: %100** ve **Kenar boşlukları: Yok** seçin.
 
-## 9. Yedekleme ve geri yükleme
+## 13. Yedekleme ve geri yükleme
 
-- Veritabanı her 12 saatte bir otomatik yedeklenir. Son 60 yedek `C:\ProgramData\DepoTakip\yedekler` klasöründe saklanır.
-- **Ayarlar → Yedekleme** ekranından istediğiniz an yedek alabilir veya yedeği indirebilirsiniz.
-- **Önerimiz:** Haftada bir yedek klasörünü bir USB belleğe veya başka bir bilgisayara kopyalayın.
+- Veritabanı her 12 saatte bir ve her Excel içe aktarmadan önce otomatik yedeklenir. Yedekler `C:\ProgramData\DepoTakip\yedekler` klasöründedir (son 60 otomatik yedek saklanır).
+- **Ayarlar → Yedekleme** ekranından istediğiniz an yedek alabilir veya indirebilirsiniz. Haftada bir yedek klasörünü USB belleğe kopyalamanızı öneririz.
+- Tek tek işlemleri geri almak için yedeğe gerek yoktur; **Değişiklik geçmişi**ni kullanın.
 
-### Geri yükleme
+### Tüm veritabanını bir yedeğe döndürme
 
-1. Başlat menüsünde **Görev Zamanlayıcı**'yı açın, **DepoTakip Sunucu** görevine sağ tıklayıp **Sonlandır**'ı seçin.
-2. `C:\ProgramData\DepoTakip` klasöründeki `depo.db`, `depo.db-wal` ve `depo.db-shm` dosyalarını güvenli bir yere taşıyın.
-3. Geri yüklemek istediğiniz yedek dosyasını bu klasöre kopyalayın ve adını `depo.db` yapın.
-4. Görevi sağ tıklayıp **Çalıştır**'ı seçin veya bilgisayarı yeniden başlatın.
+1. **Görev Zamanlayıcı**'da **DepoTakip Sunucu** görevini sağ tıklayıp **Sonlandır**'ı seçin.
+2. `C:\ProgramData\DepoTakip` klasöründeki `depo2.db`, `depo2.db-wal`, `depo2.db-shm` dosyalarını güvenli bir yere taşıyın.
+3. Yedek dosyasını bu klasöre kopyalayıp adını `depo2.db` yapın.
+4. Görevi **Çalıştır** ile başlatın veya bilgisayarı yeniden başlatın.
 
-### Başka bilgisayara taşıma
-
-1. Yeni bilgisayara Depo Takip'i kurun.
-2. Yukarıdaki geri yükleme adımlarıyla eski bilgisayardaki `depo.db` dosyasını yeni bilgisayara taşıyın.
-3. Telefonlarda **Sunucu adresini değiştir** seçeneğiyle yeni adresi girin.
-
-## 10. Sorun giderme
+## 14. Sorun giderme
 
 | Sorun | Çözüm |
 |---|---|
-| Telefon "Sunucuya bağlanılamadı" diyor | Bilgisayar açık mı, uykuda mı? Telefon aynı Wi-Fi'da mı? Bilgisayarda **Ayarlar → Telefon bağlantısı** ekranındaki adresle telefondaki adres aynı mı? |
-| Adres değişti | Bilgisayara sabit IP verin (bkz. Bölüm 2). Telefonda **Menü → Sunucu adresini değiştir** ile yeni QR'ı okutun. |
-| Masaüstü kısayolu açılmıyor | Tarayıcıda `http://localhost:8765` adresini açmayı deneyin. Olmazsa bilgisayarı yeniden başlatın. Kayıt dosyası: `C:\ProgramData\DepoTakip\sunucu.log` |
-| Kamera açılmıyor | Telefon ayarlarından Depo Takip uygulamasına **Kamera** izni verin. |
-| Şifremi unuttum | Yönetici, **Ayarlar → Kullanıcılar** ekranından yeni şifre belirler. |
-| Yöneticinin şifresi unutuldu | Başka bir yönetici hesabı yoksa teknik destek gerekir; veritabanı dosyası bozulmadan şifre sıfırlanabilir. |
+| Telefon "Sunucuya bağlanılamadı" diyor | Bilgisayar açık ve uyanık mı? Telefon aynı modemin Wi-Fi'ında mı? Ayarlar → Telefon bağlantısı'ndaki adresle telefondaki adres aynı mı? Bkz. Bölüm 4. |
+| Adres değişti | Bilgisayara sabit IP verin. Telefonda **Sunucu adresini değiştir** ile yeni QR'ı okutun. |
+| Masaüstü kısayolu açılmıyor | Tarayıcıda `http://localhost:8765` açın. Kayıt dosyası: `C:\ProgramData\DepoTakip\sunucu.log` |
+| Güncellemeden sonra eski ekran görünüyor | Sayfayı Ctrl+F5 ile yenileyin. |
+| Bir hammaddenin cep depo stoğu eksi | Üretimde kullanılan miktar için Cep Depoya Verilen kaydı eksik. Bkz. Bölüm 9 notu. |
+| Ürün stoğu eksi | Ay başı ürün stoğu girilmemiş. Önceki ayın son gününe Ürün Sayımı girin. |
+| Yanlışlıkla sildim / değiştirdim | Değişiklik geçmişi → ilgili satır → **Geri al**. |
+| Şifremi unuttum | Yönetici, Ayarlar → Kullanıcılar ekranından yeni şifre belirler. |
 
-## 11. Teknik ayrıntılar
+## 15. Teknik ayrıntılar
 
-- **Sunucu:** Node.js 24 ve yerleşik SQLite (harici paket yok). Varsayılan port 8765; `DEPO_PORT` ortam değişkeniyle değiştirilebilir.
-- **Veri klasörü:** `C:\ProgramData\DepoTakip` (`depo.db`, `sunucu.log`, `yedekler\`).
-- **Canlı senkron:** Server-Sent Events. Değişiklikler tüm açık ekranlara anında iletilir.
-- **Güvenlik:** Şifreler scrypt ile özetlenerek saklanır. Oturum anahtarı 30 gün kullanılmazsa geçersiz olur. Sistem yalnızca yerel ağda çalışır, internete açılmaz.
-- **Android:** WebView tabanlı uygulama. Google Play Hizmetleri'nin QR tarayıcısını, yoksa yerleşik ZXing tarayıcıyı kullanır. Desteklenen sürüm: Android 7.0 ve üzeri.
+- **Sunucu:** Node.js 22.13+ / 24 ve yerleşik SQLite; harici paket yok. Port 8765 (`DEPO_PORT` ile değiştirilebilir).
+- **Veri klasörü:** `C:\ProgramData\DepoTakip` — `depo2.db` (2.0), `depo.db` (eski 1.x, dokunulmaz), `sunucu.log`, `yedekler\`.
+- **Veri yapısı:** her kayıt bir belge olarak saklanır; her değişiklik önceki ve sonraki haliyle ayrı bir tabloya yazılır (geri al / yinele bu kayıtlardan yapılır). Stoklar saklanmaz, kayıtlardan hesaplanır.
+- **Canlı senkron:** Server-Sent Events.
+- **Güvenlik:** şifreler scrypt ile saklanır; oturum 30 gün kullanılmazsa düşer; sistem yalnızca yerel ağda çalışır.
+- **Android:** WebView tabanlı uygulama; arayüzü sunucudan yükler, bu yüzden arayüz güncellemeleri için APK'yı yeniden kurmak gerekmez.
