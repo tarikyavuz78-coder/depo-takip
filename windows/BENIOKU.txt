@@ -1,0 +1,26 @@
+DEPO TAKIP 2.1 - GUNCELLEME
+
+MEVCUT KURULUMU GUNCELLEME (2.0 -> 2.1)
+1) Bu klasorun icindekileri mevcut kurulum klasorunun (orn. C:\DepoTakip) UZERINE kopyalayin, "Dosyalari degistir" deyin.
+2) Kur.bat dosyasina tekrar cift tiklayin, yonetici iznini onaylayin (sunucu yeniden baslar).
+3) Bilgisayarda ve telefonlarda sayfayi yenileyin (Ctrl+F5). Android uygulamasini yeniden kurmaniz GEREKMEZ.
+
+   Veritabani (C:\ProgramData\DepoTakip\depo2.db) oldugu gibi kalir: tum kayitlar, kullanicilar,
+   sifreler ve tanimlar korunur. Ilk acilista:
+   - Urunlere mamul kodu verilir (MML-001 ...), urun QR etiketleri icin.
+   - "Depocu" hesaplari "Depo sorumlusu", "Izleyici" hesaplari "Rapor kullanicisi" olur.
+   Guncellemeden once Ayarlar > Yedekleme > "Simdi yedek al" demeniz onerilir.
+
+YENILIKLER (ayrinti: belgeler\KULLANIM-KILAVUZU.html, "2.1 surumunde neler yeni?")
+- 5 rol (Ana yonetici, Depo / Uretim / Sevkiyat sorumlusu, Rapor kullanicisi) ve kullanici bazinda
+  Gorur / Ekler / Duzenler / Siler yetkileri, rapor ve ekran secimi, kullanici silme
+- Mamul kodlari, urun QR etiketleri, urun karti; el tipi barkod okuyucu destegi
+- Sevkiyat: musteri, adres, irsaliye, plaka, QR ile dogrulama, stok uyarisi
+- Yeni panel, gecmis gun stok durumu, hammadde hareketleri, kullanici islem raporu
+- Excel rapor merkezi (tarih araligi; ana depo, cep depo, genel yonetici raporu ...)
+- Excel'den kayit yukleme: sablon, onizleme, mukerrer kontrolu, hata raporu
+
+YENI KURULUM
+1) https://nodejs.org adresinden "LTS" surumunu (24.x) indirip kurun.
+2) Bu klasoru C:\DepoTakip konumuna kopyalayin.
+3) Kur.bat dosyasina cift tiklayin, yonetici iznini onaylayin.
